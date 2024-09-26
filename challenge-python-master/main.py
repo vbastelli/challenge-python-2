@@ -209,15 +209,12 @@ def quiz():
     ]
     
     opcoes = [
-        # Opções originais
         ["Nyck de Vries", "António Félix da Costa", "Jean-Éric Vergne", "Lucas di Grassi"],
         ["Pequim", "Paris", "Nova York", "Londres"],
         ["Tem 10 etapas por temporada", "Tem 12 etapas por temporada", "Tem 15 etapas por temporada", "Tem 20 etapas por temporada"],
         ["Sebastien Buemi ganhou 3 corridas na temporada 2016–17", "Jean-Éric Vergne ganhou 4 corridas na temporada 2017–18", 
          "Lucas di Grassi ganhou 5 corridas na temporada 2018–19", "António Félix da Costa ganhou 6 corridas na temporada 2019–20"],
         ["DS Techeetah", "Audi Sport ABT Schaeffler", "Mercedes-EQ Formula E Team", "Envision Virgin Racing"],
-
-        # Novas opções
         ["Nelson Piquet Jr.", "Lucas di Grassi", "Sébastien Buemi", "Jean-Éric Vergne"],
         ["Renault e.dams", "Audi Sport ABT Schaeffler", "DS Techeetah", "Mercedes-EQ Formula E Team"],
         ["Mônaco", "Berlim", "Nova York", "Cidade do México"],
