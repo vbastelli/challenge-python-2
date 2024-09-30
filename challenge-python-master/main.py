@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from data import formula_e_drivers, events_data, participants_data
 import os
+import random
 
 # Para exibir todas as linhas do DataFrame
 pd.set_option('display.max_rows', None)
@@ -81,9 +82,14 @@ def mostrar_info(escolha):
     print(f"FanBoosts: {info['FanBoosts']}")
     print(f"Pontos: {info['Points']}")
 
-# Filtrar pilotos
 def filtrar_pilotos():
     df = pegar_dataframe_pilotos()
+
+    # Remover espaços em branco e garantir que a coluna Points é numérica
+    df['Points'] = df['Points'].astype(str).str.strip()  # Remove espaços em branco
+    df['Points'] = pd.to_numeric(df['Points'], errors='coerce')  # Converte para numérico
+
+    # Filtrar os pilotos com base no filtro escolhido
     print("Filtros que você pode usar:")
     print("1. Nacionalidade")
     print("2. Títulos de campeonato")
@@ -98,36 +104,66 @@ def filtrar_pilotos():
 
     escolha_filtro = pedir_entrada("Qual filtro você quer usar? (1-10): ", opcoes_validas=[str(i) for i in range(1, 11)])
 
-    if escolha_filtro in ['1', '2']:
-        valor = pedir_entrada("Qual valor você quer filtrar? ")
-        if escolha_filtro == '1':
-            df_filtrado = df[df['Nationality'].str.contains(valor, case=False)]
-        elif escolha_filtro == '2':
-            df_filtrado = df[df['Championship_titles'] == int(valor)]
+    if escolha_filtro == '1':  # Nacionalidade
+        nacionalidade = pedir_entrada("Digite a nacionalidade: ")
+        df_filtrado = df[df['Nationality'].str.contains(nacionalidade, case=False, na=False)]
+    elif escolha_filtro == '2':  # Títulos de campeonato
+        df_filtrado = df[df['Championship_titles'] >= 0]  # Filtra todos com títulos
+    elif escolha_filtro == '3':  # Entradas
+        df_filtrado = df.nlargest(10, 'Entries')  # Top 10 por Entradas
+    elif escolha_filtro == '4':  # Starts
+        df_filtrado = df.nlargest(10, 'Starts')  # Top 10 por Starts
+    elif escolha_filtro == '5':  # Poles
+        df_filtrado = df.nlargest(10, 'Poles')
+    elif escolha_filtro == '6':  # Vitórias
+        df_filtrado = df.nlargest(10, 'Wins')
+    elif escolha_filtro == '7':  # Pódios
+        df_filtrado = df.nlargest(10, 'Podiums')
+    elif escolha_filtro == '8':  # Voltas mais rápidas
+        df_filtrado = df.nlargest(10, 'Fastest_Laps')
+    elif escolha_filtro == '9':  # FanBoosts
+        df_filtrado = df.nlargest(10, 'FanBoosts')
+    elif escolha_filtro == '10':  # Pontos
+        df_filtrado = df.nlargest(10, 'Points')
     else:
-        valor = pedir_entrada("Qual valor você quer filtrar? ", eh_numerico=True)
-        if escolha_filtro == '3':
-            df_filtrado = df[df['Entries'] >= valor]
-        elif escolha_filtro == '4':
-            df_filtrado = df[df['Starts'] >= valor]
-        elif escolha_filtro == '5':
-            df_filtrado = df[df['Poles'] >= valor]
-        elif escolha_filtro == '6':
-            df_filtrado = df[df['Wins'] >= valor]
-        elif escolha_filtro == '7':
-            df_filtrado = df[df['Podiums'] >= valor]
-        elif escolha_filtro == '8':
-            df_filtrado = df[df['Fastest_Laps'] >= valor]
-        elif escolha_filtro == '9':
-            df_filtrado = df[df['FanBoosts'] >= valor]
-        elif escolha_filtro == '10':
-            df_filtrado = df[df['Points'] >= valor]
-        else:
-            print("Filtro inválido.")
-            return
+        print("Filtro inválido.")
+        return
 
     if not df_filtrado.empty:
-        print(df_filtrado[['Piloto', 'Nationality', 'Championship_titles']])
+        # Exibir dados dos pilotos com base no filtro escolhido
+        filtro_coluna = ''
+        if escolha_filtro == '2':
+            filtro_coluna = 'Championship_titles'
+            coluna_nome = 'Títulos de campeonato'
+        elif escolha_filtro == '3':
+            filtro_coluna = 'Entries'
+            coluna_nome = 'Entradas'
+        elif escolha_filtro == '4':
+            filtro_coluna = 'Starts'
+            coluna_nome = 'Starts'
+        elif escolha_filtro == '5':
+            filtro_coluna = 'Poles'
+            coluna_nome = 'Poles'
+        elif escolha_filtro == '6':
+            filtro_coluna = 'Wins'
+            coluna_nome = 'Vitórias'
+        elif escolha_filtro == '7':
+            filtro_coluna = 'Podiums'
+            coluna_nome = 'Pódios'
+        elif escolha_filtro == '8':
+            filtro_coluna = 'Fastest_Laps'
+            coluna_nome = 'Voltas mais rápidas'
+        elif escolha_filtro == '9':
+            filtro_coluna = 'FanBoosts'
+            coluna_nome = 'FanBoosts'
+        elif escolha_filtro == '10':
+            filtro_coluna = 'Points'
+            coluna_nome = 'Pontos'
+
+        # Exibe os resultados com o filtro apropriado
+        df_filtrado[coluna_nome] = df_filtrado[filtro_coluna]  # Renomeia a coluna para exibir
+        print(df_filtrado[['Piloto', 'Nationality', coluna_nome]])
+
         piloto_escolhido = pedir_entrada("Qual piloto você quer saber mais? ")
         if piloto_escolhido in df_filtrado['Piloto'].values:
             mostrar_info(piloto_escolhido)
@@ -156,19 +192,13 @@ def plotar_classificacao():
     plt.show()
 
 # Quiz sobre a Fórmula E
-import random
-
-# Quiz sobre a Fórmula E
 def quiz():
     perguntas = [
-        # Perguntas originais
         "Quem é o atual campeão da Fórmula E?",
         "Qual cidade teve a primeira corrida da Fórmula E?",
         "Quantas etapas tem uma temporada padrão da Fórmula E?",
         "Qual é o recorde de vitórias numa única temporada da Fórmula E?",
         "Qual equipe tem mais títulos de construtores na Fórmula E?",
-
-        # Novas perguntas
         "Quem foi o primeiro campeão da Fórmula E?",
         "Qual equipe venceu o primeiro título de construtores da Fórmula E?",
         "Qual é o circuito mais curto da Fórmula E?",
@@ -183,16 +213,13 @@ def quiz():
         "Qual piloto tem o maior número de GPs disputados na Fórmula E?",
         "Em qual cidade a primeira corrida da temporada 2019-20 foi realizada?"
     ]
-    
+
     respostas = [
-        # Respostas originais
         "Nyck de Vries",
         "Pequim",
         "Tem 15 etapas por temporada",
         "Jean-Éric Vergne ganhou 4 corridas na temporada 2017–18",
         "DS Techeetah",
-
-        # Novas respostas
         "Nelson Piquet Jr.",
         "Renault e.dams",
         "Mônaco",
@@ -207,56 +234,64 @@ def quiz():
         "Lucas di Grassi",
         "Riade, Arábia Saudita"
     ]
-    
+
     opcoes = [
         ["Nyck de Vries", "António Félix da Costa", "Jean-Éric Vergne", "Lucas di Grassi"],
         ["Pequim", "Paris", "Nova York", "Londres"],
-        ["Tem 10 etapas por temporada", "Tem 12 etapas por temporada", "Tem 15 etapas por temporada", "Tem 20 etapas por temporada"],
-        ["Sebastien Buemi ganhou 3 corridas na temporada 2016–17", "Jean-Éric Vergne ganhou 4 corridas na temporada 2017–18", 
-         "Lucas di Grassi ganhou 5 corridas na temporada 2018–19", "António Félix da Costa ganhou 6 corridas na temporada 2019–20"],
-        ["DS Techeetah", "Audi Sport ABT Schaeffler", "Mercedes-EQ Formula E Team", "Envision Virgin Racing"],
+        ["Tem 10 etapas por temporada", "Tem 12 etapas por temporada", 
+         "Tem 15 etapas por temporada", "Tem 20 etapas por temporada"],
+        ["Sebastien Buemi ganhou 3 corridas na temporada 2016–17", 
+         "Jean-Éric Vergne ganhou 4 corridas na temporada 2017–18", 
+         "Lucas di Grassi ganhou 5 corridas na temporada 2018–19", 
+         "António Félix da Costa ganhou 6 corridas na temporada 2019–20"],
+        ["DS Techeetah", "Audi Sport ABT Schaeffler", 
+         "Mercedes-EQ Formula E Team", "Envision Virgin Racing"],
         ["Nelson Piquet Jr.", "Lucas di Grassi", "Sébastien Buemi", "Jean-Éric Vergne"],
-        ["Renault e.dams", "Audi Sport ABT Schaeffler", "DS Techeetah", "Mercedes-EQ Formula E Team"],
+        ["Renault e.dams", "Audi Sport ABT Schaeffler", 
+         "DS Techeetah", "Mercedes-EQ Formula E Team"],
         ["Mônaco", "Berlim", "Nova York", "Cidade do México"],
-        ["Spark-Renault SRT 01E", "Spark SRT05e", "Porsche 99X Electric", "Jaguar I-Type 6"],
+        ["Spark-Renault SRT 01E", "Spark SRT05e", 
+         "Porsche 99X Electric", "Jaguar I-Type 6"],
         ["10 equipes", "11 equipes", "12 equipes", "13 equipes"],
         ["Lucas di Grassi", "Sébastien Buemi", "Mitch Evans", "Jean-Éric Vergne"],
         ["2013", "2014", "2015", "2016"],
-        ["2 carros por equipe", "3 carros por equipe", "4 carros por equipe", "5 carros por equipe"],
-        ["DS Techeetah", "Envision Racing", "Mercedes-EQ Formula E Team", "Jaguar TCS Racing"],
+        ["2 carros por equipe", "3 carros por equipe", 
+         "4 carros por equipe", "5 carros por equipe"],
+        ["DS Techeetah", "Envision Racing", 
+         "Mercedes-EQ Formula E Team", "Jaguar TCS Racing"],
         ["30 cidades", "31 cidades", "32 cidades", "33 cidades"],
         ["200 km/h", "210 km/h", "220 km/h", "230 km/h"],
-        ["Lucas di Grassi", "Sébastien Buemi", "Stoffel Vandoorne", "Jake Dennis"],
-        ["Berlim, Alemanha", "Londres, Reino Unido", "Riade, Arábia Saudita", "Mônaco, Monte Carlo"]
+        ["Lucas di Grassi", "Sébastien Buemi", 
+         "Stoffel Vandoorne", "Jake Dennis"],
+        ["Berlim, Alemanha","Londres, Reino Unido","Riade, Arábia Saudita","Mônaco, Monte Carlo"]
     ]
-    
+
     # Sortear 5 perguntas aleatórias
     indices_sorteados = random.sample(range(len(perguntas)), 5)
-    
     pontuacao = 0
+
     for i in indices_sorteados:
         print(f"\nPergunta: {perguntas[i]}")
         for j, opcao in enumerate(opcoes[i]):
             print(f"{j + 1}. {opcao}")
+
         resposta_usuario = pedir_entrada("Escolha a alternativa certa (1, 2, 3 ou 4): ", opcoes_validas=['1', '2', '3', '4'])
 
         # Verifica se a resposta está correta
         correta = opcoes[i].index(respostas[i]) + 1
+
         if resposta_usuario == str(correta):
             print("Acertou! 🎉")
             pontuacao += 1
         else:
             print(f"Errou! A resposta certa era: {respostas[i]}")
 
-    print(f"\nVocê acertou {pontuacao} de 5 perguntas.")
+    # Exibe a pontuação ao final do quiz
+    print(f"\nVocê acertou {pontuacao} de 5 perguntas. Fim do quiz.")
 
-
-
-
-# Loop principal
-continuar = True
-
-while continuar:
+# Loop do programa
+while True:
+    limpar_tela()
     escolha = menu()
 
     if escolha == '1':
@@ -271,9 +306,8 @@ while continuar:
         quiz()
     elif escolha == '6':
         plotar_classificacao()
-
-    continuar = pedir_entrada("\nVocê quer fazer outra coisa? (s/n): ", opcoes_validas=['s', 'n']) == 's'
-    limpar_tela()
-
-print("Obrigado por usar o programa! Até a próxima!")
-
+    else:
+        print("Opção inválida.")
+    
+    if pedir_entrada("Deseja continuar? (s/n) ", opcoes_validas=['s', 'n']) == 'n':
+        break
