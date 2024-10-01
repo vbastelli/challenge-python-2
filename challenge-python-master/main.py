@@ -82,6 +82,10 @@ def mostrar_info(escolha):
     print(f"FanBoosts: {info['FanBoosts']}")
     print(f"Pontos: {info['Points']}")
 
+import pandas as pd
+
+import pandas as pd
+
 def filtrar_pilotos():
     df = pegar_dataframe_pilotos()
 
@@ -104,73 +108,89 @@ def filtrar_pilotos():
 
     escolha_filtro = pedir_entrada("Qual filtro você quer usar? (1-10): ", opcoes_validas=[str(i) for i in range(1, 11)])
 
-    if escolha_filtro == '1':  # Nacionalidade
-        nacionalidade = pedir_entrada("Digite a nacionalidade: ")
-        df_filtrado = df[df['Nationality'].str.contains(nacionalidade, case=False, na=False)]
-    elif escolha_filtro == '2':  # Títulos de campeonato
-        df_filtrado = df[df['Championship_titles'] >= 0]  # Filtra todos com títulos
-    elif escolha_filtro == '3':  # Entradas
-        df_filtrado = df.nlargest(10, 'Entries')  # Top 10 por Entradas
-    elif escolha_filtro == '4':  # Starts
-        df_filtrado = df.nlargest(10, 'Starts')  # Top 10 por Starts
-    elif escolha_filtro == '5':  # Poles
-        df_filtrado = df.nlargest(10, 'Poles')
-    elif escolha_filtro == '6':  # Vitórias
-        df_filtrado = df.nlargest(10, 'Wins')
-    elif escolha_filtro == '7':  # Pódios
-        df_filtrado = df.nlargest(10, 'Podiums')
-    elif escolha_filtro == '8':  # Voltas mais rápidas
-        df_filtrado = df.nlargest(10, 'Fastest_Laps')
-    elif escolha_filtro == '9':  # FanBoosts
-        df_filtrado = df.nlargest(10, 'FanBoosts')
-    elif escolha_filtro == '10':  # Pontos
-        df_filtrado = df.nlargest(10, 'Points')
-    else:
-        print("Filtro inválido.")
-        return
-
-    if not df_filtrado.empty:
-        # Exibir dados dos pilotos com base no filtro escolhido
-        filtro_coluna = ''
-        if escolha_filtro == '2':
-            filtro_coluna = 'Championship_titles'
-            coluna_nome = 'Títulos de campeonato'
-        elif escolha_filtro == '3':
-            filtro_coluna = 'Entries'
-            coluna_nome = 'Entradas'
-        elif escolha_filtro == '4':
-            filtro_coluna = 'Starts'
-            coluna_nome = 'Starts'
-        elif escolha_filtro == '5':
-            filtro_coluna = 'Poles'
-            coluna_nome = 'Poles'
-        elif escolha_filtro == '6':
-            filtro_coluna = 'Wins'
-            coluna_nome = 'Vitórias'
-        elif escolha_filtro == '7':
-            filtro_coluna = 'Podiums'
-            coluna_nome = 'Pódios'
-        elif escolha_filtro == '8':
-            filtro_coluna = 'Fastest_Laps'
-            coluna_nome = 'Voltas mais rápidas'
-        elif escolha_filtro == '9':
-            filtro_coluna = 'FanBoosts'
-            coluna_nome = 'FanBoosts'
-        elif escolha_filtro == '10':
-            filtro_coluna = 'Points'
-            coluna_nome = 'Pontos'
-
-        # Exibe os resultados com o filtro apropriado
-        df_filtrado[coluna_nome] = df_filtrado[filtro_coluna]  # Renomeia a coluna para exibir
-        print(df_filtrado[['Piloto', 'Nationality', coluna_nome]])
-
-        piloto_escolhido = pedir_entrada("Qual piloto você quer saber mais? ")
-        if piloto_escolhido in df_filtrado['Piloto'].values:
-            mostrar_info(piloto_escolhido)
+    try:
+        if escolha_filtro == '1':  # Nacionalidade
+            nacionalidade = pedir_entrada("Digite a nacionalidade: ")
+            df_filtrado = df[df['Nationality'].str.contains(nacionalidade, case=False, na=False)]
+        elif escolha_filtro == '2':  # Títulos de campeonato
+            df_filtrado = df[df['Championship_titles'] >= 0]  # Filtra todos com títulos
+        elif escolha_filtro == '3':  # Entradas
+            df_filtrado = df.nlargest(10, 'Entries')  # Top 10 por Entradas
+        elif escolha_filtro == '4':  # Starts
+            df_filtrado = df.nlargest(10, 'Starts')  # Top 10 por Starts
+        elif escolha_filtro == '5':  # Poles
+            df_filtrado = df.nlargest(10, 'Poles')
+        elif escolha_filtro == '6':  # Vitórias
+            df_filtrado = df.nlargest(10, 'Wins')
+        elif escolha_filtro == '7':  # Pódios
+            df_filtrado = df.nlargest(10, 'Podiums')
+        elif escolha_filtro == '8':  # Voltas mais rápidas
+            df_filtrado = df.nlargest(10, 'Fastest_Laps')
+        elif escolha_filtro == '9':  # FanBoosts
+            df_filtrado = df.nlargest(10, 'FanBoosts')
+        elif escolha_filtro == '10':  # Pontos
+            df_filtrado = df.nlargest(10, 'Points')
         else:
-            print("Piloto não encontrado.")
-    else:
-        print("Nenhum piloto encontrado com esse filtro.")
+            print("Filtro inválido.")
+            return
+
+        if not df_filtrado.empty:
+            # Exibir dados dos pilotos com base no filtro escolhido
+            filtro_coluna = None
+            coluna_nome = None
+            
+            # Definindo filtro_coluna e coluna_nome
+            if escolha_filtro == '1':
+                filtro_coluna = 'Nationality'
+                coluna_nome = 'Nacionalidade'
+            elif escolha_filtro == '2':
+                filtro_coluna = 'Championship_titles'
+                coluna_nome = 'Títulos de campeonato'
+            elif escolha_filtro == '3':
+                filtro_coluna = 'Entries'
+                coluna_nome = 'Entradas'
+            elif escolha_filtro == '4':
+                filtro_coluna = 'Starts'
+                coluna_nome = 'Starts'
+            elif escolha_filtro == '5':
+                filtro_coluna = 'Poles'
+                coluna_nome = 'Poles'
+            elif escolha_filtro == '6':
+                filtro_coluna = 'Wins'
+                coluna_nome = 'Vitórias'
+            elif escolha_filtro == '7':
+                filtro_coluna = 'Podiums'
+                coluna_nome = 'Pódios'
+            elif escolha_filtro == '8':
+                filtro_coluna = 'Fastest_Laps'
+                coluna_nome = 'Voltas mais rápidas'
+            elif escolha_filtro == '9':
+                filtro_coluna = 'FanBoosts'
+                coluna_nome = 'FanBoosts'
+            elif escolha_filtro == '10':
+                filtro_coluna = 'Points'
+                coluna_nome = 'Pontos'
+
+            try:
+                # Exibe os resultados com o filtro apropriado
+                df_filtrado[coluna_nome] = df_filtrado[filtro_coluna]  # Renomeia a coluna para exibir
+                print(df_filtrado[['Piloto', 'Nationality', coluna_nome]])
+            except KeyError as e:
+                print(f"Erro: A coluna '{e.args[0]}' não foi encontrada no DataFrame.")
+                return
+
+            piloto_escolhido = pedir_entrada("Qual piloto você quer saber mais? ")
+            if piloto_escolhido in df_filtrado['Piloto'].values:
+                mostrar_info(piloto_escolhido)
+            else:
+                print("Piloto não encontrado.")
+        else:
+            print("Nenhum piloto encontrado com esse filtro.")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
+
+# Chame a função filtrar_pilotos
+
 
 # Mostrar datas dos próximos eventos
 def mostrar_datas():
