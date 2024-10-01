@@ -82,9 +82,6 @@ def mostrar_info(escolha):
     print(f"FanBoosts: {info['FanBoosts']}")
     print(f"Pontos: {info['Points']}")
 
-import pandas as pd
-
-import pandas as pd
 
 def filtrar_pilotos():
     df = pegar_dataframe_pilotos()
@@ -111,25 +108,25 @@ def filtrar_pilotos():
     try:
         if escolha_filtro == '1':  # Nacionalidade
             nacionalidade = pedir_entrada("Digite a nacionalidade: ")
-            df_filtrado = df[df['Nationality'].str.contains(nacionalidade, case=False, na=False)]
+            df_filtrado = df[df['Nationality'].str.contains(nacionalidade, case=False, na=False)].copy()  # Cria uma cópia
         elif escolha_filtro == '2':  # Títulos de campeonato
-            df_filtrado = df[df['Championship_titles'] >= 0]  # Filtra todos com títulos
+            df_filtrado = df[df['Championship_titles'] >= 0].copy()  # Cria uma cópia
         elif escolha_filtro == '3':  # Entradas
-            df_filtrado = df.nlargest(10, 'Entries')  # Top 10 por Entradas
+            df_filtrado = df.nlargest(10, 'Entries').copy()  # Cria uma cópia
         elif escolha_filtro == '4':  # Starts
-            df_filtrado = df.nlargest(10, 'Starts')  # Top 10 por Starts
+            df_filtrado = df.nlargest(10, 'Starts').copy()  # Cria uma cópia
         elif escolha_filtro == '5':  # Poles
-            df_filtrado = df.nlargest(10, 'Poles')
+            df_filtrado = df.nlargest(10, 'Poles').copy()  # Cria uma cópia
         elif escolha_filtro == '6':  # Vitórias
-            df_filtrado = df.nlargest(10, 'Wins')
+            df_filtrado = df.nlargest(10, 'Wins').copy()  # Cria uma cópia
         elif escolha_filtro == '7':  # Pódios
-            df_filtrado = df.nlargest(10, 'Podiums')
+            df_filtrado = df.nlargest(10, 'Podiums').copy()  # Cria uma cópia
         elif escolha_filtro == '8':  # Voltas mais rápidas
-            df_filtrado = df.nlargest(10, 'Fastest_Laps')
+            df_filtrado = df.nlargest(10, 'Fastest_Laps').copy()  # Cria uma cópia
         elif escolha_filtro == '9':  # FanBoosts
-            df_filtrado = df.nlargest(10, 'FanBoosts')
+            df_filtrado = df.nlargest(10, 'FanBoosts').copy()  # Cria uma cópia
         elif escolha_filtro == '10':  # Pontos
-            df_filtrado = df.nlargest(10, 'Points')
+            df_filtrado = df.nlargest(10, 'Points').copy()  # Cria uma cópia
         else:
             print("Filtro inválido.")
             return
@@ -173,7 +170,7 @@ def filtrar_pilotos():
 
             try:
                 # Exibe os resultados com o filtro apropriado
-                df_filtrado[coluna_nome] = df_filtrado[filtro_coluna]  # Renomeia a coluna para exibir
+                df_filtrado[coluna_nome] = df_filtrado[filtro_coluna].copy()  # Renomeia a coluna para exibir
                 print(df_filtrado[['Piloto', 'Nationality', coluna_nome]])
             except KeyError as e:
                 print(f"Erro: A coluna '{e.args[0]}' não foi encontrada no DataFrame.")
@@ -190,6 +187,7 @@ def filtrar_pilotos():
         print(f"Ocorreu um erro: {e}")
 
 # Chame a função filtrar_pilotos
+
 
 
 # Mostrar datas dos próximos eventos
